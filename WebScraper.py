@@ -55,7 +55,6 @@ def print_info(response):
 def get_product():
     product = input("Cosa stai cercando?(subito.it) ")
     return product.replace(" ", "%20")
-    print("Ok ricerco...")
     
     
 if __name__ == "__main__":
