@@ -25,12 +25,17 @@ def main():
         
 def print_info(response):
     soup = BeautifulSoup(response.text, 'html.parser')
-    objects = soup.find_all('h2', class_='ItemTitle-module_item-title__VuKDo')
+    links = soup.find_all('a', class_='SmallCard-module_link__hOkzY')
 
-    for object in objects:
+    # Estrai gli attributi 'href' da ciascun link
+    for link in links:
+        href = link.get('href')
+        object = link.find_next('h2', class_='ItemTitle-module_item-title__VuKDo')
+        price = object.find_next('p', class_='index-module_price__N7M2x').text
+        
         # Estrai le informazioni desiderate per ogni oggetto
         object_name = object.text
-        price = object.find_next('p', class_='index-module_price__N7M2x').text
+        
         if "Venduto" in price:
             object_state = "Venduto"
             price = price.replace("Venduto", "")
@@ -41,10 +46,10 @@ def print_info(response):
             object_state = "Sconosciuto"
 
         # Stampa le informazioni per ogni oggetto
-        print("Nome dell'oggetto:", object_name)
+        print("\nNome dell'oggetto:", object_name)
         print("Prezzo:", price)
         print("Stato dell'oggetto:", object_state)
-        print("\n")
+        print(f"Link diretto: {href}\n")
     
 # Get the product that the user wants:
 def get_product():
