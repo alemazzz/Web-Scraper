@@ -1,11 +1,23 @@
-import requests
+import requests, argparse
 from bs4 import BeautifulSoup
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-w", "--write",action="store_true", dest="write", help="write the html in a txt file")
+parser.set_defaults(write=False)
+    
+args = parser.parse_args()
+
 
 def main():
     product = get_product()
     subito_url = f'https://www.subito.it/annunci-italia/vendita/informatica/?q={product}'
 
     response = requests.get(subito_url)
+    if args.write == True:
+        with open('html.txt', "w") as file:
+            file.write(response.text)
+            
     if response.status_code == 200:
         print_info(response)
     else:
@@ -25,6 +37,8 @@ def print_info(response):
         elif "Spedizione disponibile" in price:
             object_state = "Spedizione disponibile"
             price = price.replace("Spedizione disponibile", "")
+        else:
+            object_state = "Sconosciuto"
 
         # Stampa le informazioni per ogni oggetto
         print("Nome dell'oggetto:", object_name)
