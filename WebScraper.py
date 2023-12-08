@@ -1,6 +1,7 @@
 import requests, argparse
 from bs4 import BeautifulSoup
 
+# Aggiungi command-line arguments:
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-w", "--write",action="store_true", dest="write", help="write the html in a txt file")
@@ -27,13 +28,13 @@ def print_info(response):
     soup = BeautifulSoup(response.text, 'html.parser')
     links = soup.find_all('a', class_='SmallCard-module_link__hOkzY')
 
-    # Estrai gli attributi 'href' da ciascun link
+    # Estrai gli attributi 'nome, prezzo, stato, link' di ciascun prodotto
     for link in links:
         href = link.get('href')
         object = link.find_next('h2', class_='ItemTitle-module_item-title__VuKDo')
-        price = object.find_next('p', class_='index-module_price__N7M2x').text
+        price = link.find_next('p', class_='index-module_price__N7M2x').text
         
-        # Estrai le informazioni desiderate per ogni oggetto
+        # Aggiusta i vari attributi dei prodotti
         object_name = object.text
         
         if "Venduto" in price:
@@ -45,16 +46,15 @@ def print_info(response):
         else:
             object_state = "Sconosciuto"
 
-        # Stampa le informazioni per ogni oggetto
-        print("\nNome dell'oggetto:", object_name)
-        print("Prezzo:", price)
-        print("Stato dell'oggetto:", object_state)
+        # Stampa le informazioni per ogni prodotto
+        print(f"\nNome del prodotto: {object_name}")
+        print(f"Prezzo: {price}")
+        print(f"Stato del prodotto: {object_state}")
         print(f"Link diretto: {href}\n")
     
-# Get the product that the user wants:
+# Ricerca il prodotto che vuole l'utente:
 def get_product():
-    product = input("Cosa stai cercando?(subito.it) ")
-    return product.replace(" ", "%20")
+    return input("Cosa stai cercando? (subito.it) ").replace(" ", "%20")
     
     
 if __name__ == "__main__":
