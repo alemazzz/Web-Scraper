@@ -53,4 +53,3 @@ python subito_scraper.py -w
 - The extracted information is printed to the console.
 
 - If the HTTP request to Subito.it is successful (status code 200), the script proceeds to extract and display information. Otherwise, it prints "Not found."
-```
