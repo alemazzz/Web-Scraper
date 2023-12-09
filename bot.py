@@ -1,4 +1,4 @@
-import requests, argparse
+import requests, argparse, sys
 from bs4 import BeautifulSoup
 
 # Aggiungi command-line arguments:
@@ -12,19 +12,30 @@ args = parser.parse_args()
 
 def main():
     product = get_product()
-    subito_url = f'https://www.subito.it/annunci-italia/vendita/informatica/?q={product}'
-
-    response = requests.get(subito_url)
+    subito_url = f'https://www.subito.it/annunci-italia/vendita/usato/?q={product}'
+    
+    # Richiede html di subito       
+    try:
+        response = requests.get(subito_url)
+    except Exception:
+        sys.exit("Error occurred, maybe you are not connected to internet?")
+    
+    info = get_info(response)
+    
+    # Scrive l'html in un file txt se occorre
     if args.write == True:
         with open('html.txt', "w") as file:
             file.write(response.text)
+    
+    for link in info:
+        # Stampa le informazioni per ogni prodotto
+        print(f"\nNome del prodotto: {info[link][0]}")
+        print(f"Prezzo: {info[link][1]}")
+        print(f"Stato del prodotto: {info[link][2]}")
+        print(f"Link diretto: {link}\n")
             
-    if response.status_code == 200:
-        print_info(response)
-    else:
-        print("Not found.")
-        
-def print_info(response):
+def get_info(response):
+    info = {}
     soup = BeautifulSoup(response.text, 'html.parser')
     links = soup.find_all('a', class_='SmallCard-module_link__hOkzY')
 
@@ -46,15 +57,14 @@ def print_info(response):
         else:
             object_state = "Sconosciuto"
 
-        # Stampa le informazioni per ogni prodotto
-        print(f"\nNome del prodotto: {object_name}")
-        print(f"Prezzo: {price}")
-        print(f"Stato del prodotto: {object_state}")
-        print(f"Link diretto: {href}\n")
+        # Salva le informazioni per ogni prodotto
+        info[href] = [object_name, price, object_state]
+    
+    return info
     
 # Ricerca il prodotto che vuole l'utente:
 def get_product():
-    return input("Cosa stai cercando? (subito.it) ").replace(" ", "%20")
+    return input("Cosa stai cercando? (subito.it) ").replace(" ", "+")
     
     
 if __name__ == "__main__":
